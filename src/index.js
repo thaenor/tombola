@@ -6,14 +6,51 @@ const renderer = new THREE.WebGLRenderer({
 });
 const scene = new Physijs.Scene;
 const camera = new THREE.PerspectiveCamera(
-    75,
+    35,
     window.innerWidth / window.innerHeight,
-    0.1,
+    1,
     1000
 );
 const texture = new THREE.TextureLoader().load("../assets/wood.jpg");
 let balls = [];
 let tombol;
+
+const initScene = () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMapSoft = true;
+    document.getElementById('viewport').appendChild(renderer.domElement);
+
+    render_stats = new Stats();
+    render_stats.domElement.style.position = 'absolute';
+    render_stats.domElement.style.top = '1px';
+    render_stats.domElement.style.zIndex = 100;
+    document.getElementById('viewport').appendChild(render_stats.domElement);
+
+    physics_stats = new Stats();
+    physics_stats.domElement.style.position = 'absolute';
+    physics_stats.domElement.style.top = '50px';
+    physics_stats.domElement.style.zIndex = 100;
+    document.getElementById('viewport').appendChild(physics_stats.domElement);
+
+    camera.position.set(60, 50, 60);
+    camera.lookAt(scene.position);
+    scene.add(camera);
+
+    scene.setGravity(new THREE.Vector3(0, -30, 0));
+    scene.addEventListener(
+        'update',
+        function () {
+            applyForce();
+            scene.simulate(undefined, 1);
+            physics_stats.update();
+        }
+    );
+    generate_floor();
+    generate_tombola();
+    generate_random_balls();
+    animate();
+}
 
 function get_random(min, max) {
     // min and max included
@@ -85,20 +122,6 @@ function animate() {
     renderer.render(scene, camera);
 
     requestAnimationFrame(animate);
-}
-
-function initScene() {
-    // Initiate function or other initializations here
-    camera.position.set(0, 7, 10);
-    camera.rotation.set(-13, 0, 0);
-
-    scene.setGravity(new THREE.Vector3(0, -0.001, 0));
-    generate_floor();
-    generate_tombola();
-    generate_random_balls();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-    animate();
 }
 
 window.onload = initScene();
