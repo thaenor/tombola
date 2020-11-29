@@ -22,31 +22,46 @@ function get_random(min, max) {
 }
 
 function generate_floor() {
-    const geometry = new THREE.BoxGeometry(1, 1);
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshBasicMaterial({
         color: 0xffff00,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
+        opacity: 0.5,
+        metalness: 0.5
     });
     const plane = new Physijs.BoxMesh(geometry, material);
-    plane.position.x = 0;
-    plane.position.y = 0;
-    plane.position.rotation = 180;
+    plane.scale.x = 30;
+    plane.scale.y = 1;
+    plane.scale.z = 30;
     scene.add(plane);
 }
 
 function generate_tombola() {
     tombol = new Physijs.SphereMesh(
-        new THREE.SphereGeometry(2.5, 32, 32),
+        new THREE.SphereGeometry(3, 32, 32),
         new THREE.MeshBasicMaterial({
-            wireframe: true,
+            wireframe: false,
             opacity: 0.5,
-            color: "#EEE"
+            color: "#EEE",
+            roughness: 0.2,
+            metalness: 0.6,
+            transparent: true,
         })
     );
-    tombol.position.x = 0;
-    tombol.position.y = 0;
-    tombol.position.z = 0;
+    tombol.position.set(0, 4.5, 0);
     scene.add(tombol);
+}
+
+
+function randomSpherePoint(x0, y0, z0, radius) {
+    var u = Math.random();
+    var v = Math.random();
+    var theta = 2 * Math.PI * u;
+    var phi = Math.acos(2 * v - 1);
+    var x = x0 + (radius * Math.sin(phi) * Math.cos(theta));
+    var y = y0 + (radius * Math.sin(phi) * Math.sin(theta));
+    var z = z0 + (radius * Math.cos(phi));
+    return [x, y, z];
 }
 
 function generate_random_balls() {
@@ -57,10 +72,8 @@ function generate_random_balls() {
                 map: texture
             })
         );
-        let x = get_random(0, 1.2);
-        let y = get_random(0, 1.2);
-        let z = get_random(0, 1.2);
-        mesh.position.setFromSphericalCoords(x, y, z);
+        let pos = randomSpherePoint(0, 4.5, 0, 2);
+        mesh.position.set(pos[0], pos[1], pos[2]);
         scene.add(mesh);
         balls.push(mesh);
     }
@@ -76,7 +89,8 @@ function animate() {
 
 function initScene() {
     // Initiate function or other initializations here
-    camera.position.z = 5;
+    camera.position.set(0, 7, 10);
+    camera.rotation.set(-13, 0, 0);
 
     scene.setGravity(new THREE.Vector3(0, -0.001, 0));
     generate_floor();
