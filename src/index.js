@@ -11,9 +11,9 @@ import {
 } from './Components/sphere.js';
 
 const state = {
-	credits: 0,
+	credits: 1,
 	paused: true,
-	game_over: true,
+	bet: 0,
 	direction: 1,
 	balls: [],
 	ground_material: {},
@@ -49,8 +49,27 @@ const init_scene = () => {
 	scene.add(light_2);
 
 	//scene.simulate();
-	//requestAnimationFrame(render);
+	requestAnimationFrame(render);
 };
+
+const render = function () {
+	if (!state.paused) {
+		floor.rotation.x += 0.003 * state.direction;
+		floor.rotation.y += 0.003 * state.direction;
+
+		if (floor.rotation.x < -0.4) state.direction = 1;
+		if (floor.rotation.x > 0.4) state.direction = -1;
+		floor.__dirtyRotation = true;
+		scene.simulate();
+	}
+
+	renderer.render(scene, camera);
+	render_stats.update();
+	controls.update();
+	requestAnimationFrame(render);
+};
+
+window.onload = init_scene();
 
 export const add_credits = (ammount) => {
 	return (state.credits += ammount);
@@ -64,14 +83,13 @@ export const remove_credits = (ammount) => {
 };
 
 export const toogle_pause = () => {
-	//TODO: maybe move this logic to events.js
 	state.paused = !state.paused;
-	if (state.game_over && !state.paused) {
+	if (!state.game_in_progress) {
 		if (state.credits === 0) {
 			toastr.error("I'm sorry, you don't have enough credits.");
 			return 0;
 		}
-		state.game_over = false;
+		state.game_in_progress = true;
 		return state.credits--;
 	}
 
@@ -80,30 +98,8 @@ export const toogle_pause = () => {
 		scene.onSimulationResume();
 	}
 
-	return state.paused;
+	return {
+		paused: state.paused,
+		game_in_progress: state.game_in_progress
+	};
 };
-
-const render = function () {
-	if (!state.paused) {
-		floor.rotation.x += 0.003 * state.direction;
-		floor.rotation.y += 0.003 * state.direction;
-
-		if (floor.rotation.x < -0.4) state.direction = 1;
-		if (floor.rotation.x > 0.4) state.direction = -1;
-		floor.__dirtyRotation = true;
-		scene.simulate();
-
-		renderer.render(scene, camera);
-		render_stats.update();
-		controls.update();
-		requestAnimationFrame(render);
-	}
-};
-
-window.onload = init_scene();
-window.addEventListener('resize', (evt) => {
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	camera.aspect = window.innerWidth / window.innerHeight;
-
-	camera.updateProjectionMatrix();
-});
