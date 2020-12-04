@@ -56,3 +56,13 @@ export const wooden_sphere_material = () => {
 		1
 	);
 };
+
+export const non_physics_wooden_sphere_material = () => {
+	return THREE.MeshStandardMaterial(
+		new THREE.MeshPhongMaterial({
+			map: loader.load('../assets/images/plywood.jpg'),
+			transparent: true,
+			opacity: 0.7
+		})
+	);
+};

@@ -38,10 +38,10 @@ export const generate_floor = () => {
 	borderTop.position.y = 2;
 
 	//TODO: make a toogle in case I dont want to see the sides
-	borderLeft.visible = false;
-	borderRight.visible = false;
-	borderTop.visible = false;
-	borderBottom.visible = false;
+	// borderLeft.visible = false;
+	// borderRight.visible = false;
+	// borderTop.visible = false;
+	// borderBottom.visible = false;
 
 	ground.add(borderLeft);
 	ground.add(borderRight);

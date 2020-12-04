@@ -2,22 +2,49 @@ body {
 	margin: 0;
 	height: 100vh;
 	overflow: hidden;
+	background: url('images/background.jpg') no-repeat center center;
+	background-size: cover;
 }
 
-.menu {
+/* .menu {
 	padding-left: 100px;
+	padding-bottom: 50px;
+} */
+
+.menu {
+	position: absolute;
+	top: 50px;
+	left: 100px;
+	width: 100%;
+}
+
+.icon-menus {
+	position: absolute;
+	top: 200px;
+	left: 20px;
+}
+
+.custom-btn {
+	background-color: rgb(23, 27, 28);
+	border-color: rgb(66, 74, 82);
+	color: white;
+}
+
+.credits-menu {
+	display: inline;
+	width: 20%;
+	padding: 10px;
+	margin-right: 20px;
+	background-color: #e59400;
+	border-radius: 10px;
 }
 
 #game {
 	width: 100%;
 	height: 100%;
 	display: block;
-	background: url('images/background.jpg') no-repeat center center;
-	background-size: cover;
-}
-
-canvas {
-	display: block;
+	/* background: url('images/table_mate.jpg') no-repeat center center;
+	background-size: cover; */
 }
 
 html,

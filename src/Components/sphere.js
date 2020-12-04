@@ -5,13 +5,12 @@ function get_random_pos(min, max) {
 	// min and max included
 	let x = Math.random() * (max - min + 1) + min;
 	x = Math.round(x * 1000) / 1000;
-	let y = Math.random() * (max - min + 1) + min;
-	y = Math.round(y * 1000) / 1000;
-	y += 15;
+	// let y = Math.random() * (max - min + 1) + min;
+	// y = Math.round(y * 1000) / 1000;
 	let z = Math.random() * (max - min + 1) + min;
 	z = Math.round(z * 1000) / 1000;
 
-	return [x, y, z];
+	return [x, 10, z];
 }
 
 const render_ball = (font, number) => {
