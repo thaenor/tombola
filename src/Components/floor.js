@@ -7,6 +7,12 @@ export const generate_floor = () => {
 		0 // mass
 	);
 
+	let top = new Physijs.BoxMesh(
+		new THREE.BoxGeometry(100, 1, 100),
+		generate_ground_material(),
+		0 // mass
+	);
+
 	let borderLeft = new Physijs.BoxMesh(
 		new THREE.BoxGeometry(2, 26, 100),
 		generate_ground_material(),
@@ -36,17 +42,20 @@ export const generate_floor = () => {
 	borderBottom.position.y = 2;
 	borderTop.position.z = -50;
 	borderTop.position.y = 2;
+	top.position.y = 15;
 
 	//TODO: make a toogle in case I dont want to see the sides
 	// borderLeft.visible = false;
 	// borderRight.visible = false;
 	// borderTop.visible = false;
 	// borderBottom.visible = false;
+	top.visible = false;
 
-	ground.add(borderLeft);
-	ground.add(borderRight);
-	ground.add(borderTop);
-	ground.add(borderBottom);
+	ground.attach(borderLeft);
+	ground.attach(borderRight);
+	ground.attach(borderTop);
+	ground.attach(borderBottom);
+	ground.attach(top);
 
 	ground.receiveShadow = true;
 	scene.add(ground);

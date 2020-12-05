@@ -2,7 +2,7 @@ const fov = 45;
 const aspect = window.innerWidth / window.innerHeight;
 const near = 1;
 const far = 1000;
-const total_balls = 25;
+const total_balls = 50;
 
 let loader = new THREE.TextureLoader();
 let font_loader = new THREE.FontLoader();

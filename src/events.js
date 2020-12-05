@@ -26,6 +26,16 @@ const validate_bet = (str) => {
 	});
 };
 
+export const reset_game = (cred) => {
+	play.html('play');
+	play.hide();
+	credits.innerHTML = cred;
+	bet_on.innerHTML = '';
+	bet_btn.show(300);
+	draw_btn.hide(300);
+	bet_menu.hide(300);
+};
+
 $('#toggle_menu').click(() => {
 	$('#menu').toggle(500);
 });
@@ -54,11 +64,10 @@ bet_btn.click((e) => {
 	//const bet = Number(window.prompt('Place a bet', '1'));
 	let bet = 1;
 	if (!Number.isNaN(bet)) {
-		// let str_bet = window.prompt(
-		// 	'What numbers would you like to bet on? [1 - 50]',
-		// 	'1 2 4'
-		// );
-		let str_bet = '1 2 33 44 59 6 asdas  3 4 ';
+		let str_bet = window.prompt(
+			'What numbers would you like to bet on? [1 - 50]',
+			'1 2 4'
+		);
 		const expected_numbers = validate_bet(str_bet);
 		const res = bet_phase(bet, expected_numbers);
 		credits.innerHTML = res.credits;
@@ -70,7 +79,10 @@ bet_btn.click((e) => {
 		draw_btn.show(600);
 		bet_menu.show(700);
 		setTimeout(() => {
-			//$('#toggle_menu').trigger('click');
+			$('#toggle_menu').trigger('click');
+			// setTimeout(() => {
+			// 	draw_btn.trigger('click');
+			// }, 5000);
 		}, 2000);
 	} else {
 		toastr.error('You must input a number as a bet');

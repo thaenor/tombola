@@ -4,7 +4,7 @@ export const generate_ground_material = () => {
 			map: loader.load('/assets/images/wood_2.jpg')
 		}),
 		0.8, // friction
-		0.4 // restitution (bouncyness)
+		0.5 // restitution (bouncyness)
 	);
 	ground_material.map.wrapS = ground_material.map.wrapT = THREE.RepeatWrapping;
 	ground_material.map.repeat.set(3, 3);
@@ -45,24 +45,22 @@ export const sphere_material = () => {
 	);
 };
 
-export const wooden_sphere_material = () => {
-	return Physijs.createMaterial(
-		new THREE.MeshPhongMaterial({
+export const wooden_sphere_material = (physics) => {
+	if (physics) {
+		return Physijs.createMaterial(
+			new THREE.MeshPhongMaterial({
+				map: loader.load('../assets/images/plywood.jpg'),
+				transparent: true,
+				opacity: 0.7
+			}),
+			0.2,
+			1
+		);
+	} else {
+		return new THREE.MeshPhongMaterial({
 			map: loader.load('../assets/images/plywood.jpg'),
 			transparent: true,
 			opacity: 0.7
-		}),
-		0.2,
-		1
-	);
-};
-
-export const non_physics_wooden_sphere_material = () => {
-	return THREE.MeshStandardMaterial(
-		new THREE.MeshPhongMaterial({
-			map: loader.load('../assets/images/plywood.jpg'),
-			transparent: true,
-			opacity: 0.7
-		})
-	);
+		});
+	}
 };

@@ -13,27 +13,38 @@ function get_random_pos(min, max) {
 	return [x, 10, z];
 }
 
-const render_ball = (font, number) => {
+export const render_ball = (font, number, physics) => {
 	const font_mesh = render_font(font, number);
-	const ball_mesh = new Physijs.SphereMesh(
-		new THREE.SphereGeometry(2, 32, 32),
-		wooden_sphere_material(),
-		1
-	);
 	const pos = get_random_pos(-10, 30);
+	let ball_mesh;
+	if (physics) {
+		ball_mesh = new Physijs.SphereMesh(
+			new THREE.SphereGeometry(2, 32, 32),
+			wooden_sphere_material(true),
+			1
+		);
+	} else {
+		ball_mesh = new THREE.Mesh(
+			new THREE.SphereGeometry(2, 32, 32),
+			wooden_sphere_material(false)
+		);
+	}
 
 	ball_mesh.position.set(pos[0], pos[1], pos[2]);
+	ball_mesh.attach(font_mesh);
 	font_mesh.position.set(-0.5, -0.5, -0.5);
-	ball_mesh.add(font_mesh);
 
 	return ball_mesh;
 };
 
 export const generate_random_balls = (font) => {
 	let ball_arr = [];
-	for (let i = 0; i < total_balls; i++) {
-		let ball_mesh = render_ball(font, i);
-		ball_arr.push(ball_mesh);
+	for (let i = 0; i <= total_balls; i++) {
+		let ball_mesh = render_ball(font, i, true);
+		ball_arr.push({
+			number: i,
+			mesh: ball_mesh
+		});
 	}
 	return ball_arr;
 };
@@ -43,7 +54,7 @@ export const add_spheres_to_scene = (balls) => {
 	let timer = setInterval(() => {
 		count++;
 		if (count < balls.length) {
-			scene.add(balls[count]);
+			scene.add(balls[count].mesh);
 		} else {
 			clearInterval(timer);
 		}

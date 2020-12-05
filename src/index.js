@@ -1,12 +1,9 @@
 import { OrbitControls } from '../assets/threejs/jsm/controls/OrbitControls.js';
 import { generate_light } from './Components/light.js';
 import { generate_floor } from './Components/floor.js';
+import { reset_game } from './events.js';
 import {
-	generate_ground_material,
-	generate_wood_material,
-	non_physics_wooden_sphere_material
-} from './Components/materials.js';
-import {
+	render_ball,
 	generate_random_balls,
 	add_spheres_to_scene
 } from './Components/sphere.js';
@@ -25,6 +22,7 @@ const state = {
 };
 let floor;
 const clock = new THREE.Clock();
+let global_font;
 
 const init_scene = () => {
 	controls = new OrbitControls(camera, document.body);
@@ -39,6 +37,7 @@ const init_scene = () => {
 	floor = generate_floor();
 
 	font_loader.load('/assets/fonts/helvetiker_regular.typeface.json', (font) => {
+		global_font = font;
 		state.balls = generate_random_balls(font);
 		add_spheres_to_scene(state.balls);
 	});
@@ -46,7 +45,8 @@ const init_scene = () => {
 	// const geometry = new THREE.BoxGeometry();
 	// const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 	// const cube = new THREE.Mesh(geometry, material);
-	// cube.position.set(-20, 40, 15);
+	// const pos = camera.clone().position;
+	// cube.position.set(pos.x - 20, pos.y - 20, pos.z - 20);
 	// scene.add(cube);
 
 	scene.add(floor);
@@ -58,19 +58,19 @@ const init_scene = () => {
 
 const render = function (time) {
 	if (!state.paused) {
-		// floor.rotation.x += 0.003 * state.direction;
-		// floor.rotation.y += 0.003 * state.direction;
-		// if (floor.rotation.x < -0.4) state.direction = 1;
-		// if (floor.rotation.x > 0.4) state.direction = -1;
-		// floor.__dirtyRotation = true;
+		floor.rotation.z += 0.002 * state.direction;
+		if (floor.rotation.z < -0.4) state.direction = 1;
+		if (floor.rotation.z > 0.4) state.direction = -1;
+
+		floor.__dirtyRotation = true;
+		requestAnimationFrame(render);
+		scene.simulate(clock.getDelta(), 1);
 	}
 
 	TWEEN.update(time);
 	renderer.render(scene, camera);
 	render_stats.update();
 	controls.update();
-	requestAnimationFrame(render);
-	scene.simulate(clock.getDelta(), 1);
 };
 
 export const toogle_pause_state = () => {
@@ -139,30 +139,55 @@ export function bet_phase(bet_value, expected_numbers) {
 
 export const draw_balls = () => {
 	let total_draws = state.bet.expected.length;
+	let meshes = [];
 
-	const mesh = state.balls[0];
-	const new_material = non_physics_wooden_sphere_material();
-	const new_mesh = new THREE.Mesh(mesh.geometry, new_material);
-	new_mesh.position.set(mesh.position);
-	scene.remove(mesh);
-	scene.add(new_mesh);
+	for (let i = 0; i < total_draws; i++) {
+		let draw = Math.floor(Math.random() * Math.floor(total_balls));
 
-	const tween1 = new TWEEN.Tween(mesh.position).to(
-		new THREE.Vector3(0, 50, 50),
-		5000
-	);
-	//mesh.position.set(new THREE.Vector3(0, 90, 90));
-	tween1.start();
+		if (state.bet.expected.includes(draw)) {
+			console.log('win');
+			alert(`Congratulations!! you win on ${draw}`);
+			state.credits++;
+		} else {
+			console.log('lose');
+		}
 
-	// for (let i = 0; i < total_draws; i++) {
-	// 	let draw = Math.floor(Math.random() * Math.floor(total_balls));
-	// 	const mesh = state.balls[draw];
-	// 	const pos = mesh.position;
-	// 	const tween1 = new TWEEN.Tween(mesh.position).to(
-	// 		new THREE.Vector3(pos, 90, pos),
-	// 		5000
-	// 	);
-	// 	//mesh.position.set(new THREE.Vector3(0, 90, 90));
-	// 	tween1.start();
-	// }
+		const mesh = state.balls[i].mesh;
+		const camera_pos = camera.clone().position;
+		const target = {
+			x: camera_pos.x - 20 + 10 * i,
+			y: camera_pos.y - 20,
+			z: camera_pos.z - 20
+		};
+		const new_mesh = render_ball(
+			global_font,
+			`${state.balls[draw].number}`,
+			false
+		);
+		meshes.push(new_mesh);
+		new_mesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+		scene.add(new_mesh);
+
+		const tween = new TWEEN.Tween(new_mesh.position)
+			.to(target, 2000)
+			.onUpdate((pos) => {
+				new_mesh.position.set(pos.x, pos.y, pos.z);
+			})
+			.onComplete((pos) => {
+				new_mesh.updateMatrix();
+				new_mesh.position.set(pos.x, pos.y, pos.z);
+			});
+
+		tween.start();
+
+		setTimeout(() => {
+			reset_game(state.credits);
+			state.bet.expected = [];
+			state.bet.placed_bet = null;
+			meshes.map((e) => {
+				scene.remove(e);
+			});
+			toogle_pause_state();
+		}, 5000);
+	}
 };
