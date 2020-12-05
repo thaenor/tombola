@@ -145,11 +145,10 @@ export const draw_balls = () => {
 		let draw = Math.floor(Math.random() * Math.floor(total_balls));
 
 		if (state.bet.expected.includes(draw)) {
-			console.log('win');
-			alert(`Congratulations!! you win on ${draw}`);
+			toastr.success(`Congratulations!! you win on ${draw}`);
 			state.credits++;
 		} else {
-			console.log('lose');
+			toastr.warning(`Sorry, ${draw} was not a winning number`);
 		}
 
 		const mesh = state.balls[i].mesh;
