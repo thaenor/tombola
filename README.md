@@ -1,4 +1,4 @@
-# tombola
+# Virtual Lottery - WebGL
 
 ## Running this project
 
